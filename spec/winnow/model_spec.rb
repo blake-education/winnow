@@ -36,27 +36,27 @@ describe Winnow::Model do
   describe ".search" do
     it "should call any class methods defined as searchable" do
       User.searchable(:name_like)
-      User.should_receive(:name_like).with("Joelle")
+      User.should_receive(:name_like).with("Joelle").and_call_original
       User.search(name_like: "Joelle")
     end
 
     it "should call any scopes defined as searchable" do
       User.searchable(:email_from)
-      User.should_receive(:email_from).with("gmail.com")
+      User.should_receive(:email_from).with("gmail.com").and_call_original
       User.search(email_from: "gmail.com")
     end
 
     it "should set up equality conditions on any fields defined as searchable" do
       User.searchable(:name)
-      User.should_receive(:where).with(name: "Don Gately")
+      User.should_receive(:where).with(name: "Don Gately").and_call_original
       User.search(name: "Don Gately")
     end
 
     it "should call all searchables if multiple params passed in" do
-      User.searchable(:name_like, :email)
-      User.should_receive(:where).with(email: "hal@eta.edu")
-      User.should_receive(:name_like).with("Incand")
-      User.search(name_like: "Incand", email: "hal@eta.edu")
+      User.searchable(:email_from, :email)
+      User.should_receive(:email_from).with("Incand").and_return(User) # fake return otherwise our expectations get confused
+      User.should_receive(:where).with(email: "hal@eta.edu").and_call_original
+      User.search(email_from: "Incand", email: "hal@eta.edu")
     end
 
     it "should ignore any non-searchable parameters" do
@@ -68,6 +68,13 @@ describe Winnow::Model do
     it "should ignore any empty arrays" do
       User.should_not_receive(:where)
       User.search(nil)
+    end
+
+    it "should return a Winnow::FormObject" do
+      obj = User.search(nil)
+      obj.class.should eq Winnow::FormObject
+      obj.model.should eq User
+      obj.params.should == {}
     end
   end
 end

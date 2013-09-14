@@ -2,9 +2,11 @@ module Winnow
   module Model
     extend ActiveSupport::Concern
 
-    module ClassMethods
-      attr_reader :searchables
+    included do
+      cattr_reader :searchables
+    end
 
+    module ClassMethods
       # Sets up any scopes and class methods which can be searched on.
       # All methods, scopes and fields are disabled by default so folks
       # can't mess with params and call methods they shouldn't have access to.
@@ -18,21 +20,23 @@ module Winnow
           str = missing.map { |s| ":#{s}" }.join(", ")
           raise RuntimeError.new("Unknown searchable: #{str}")
         else
-          @searchables = names
+          class_variable_set("@@searchables", names)
         end
       end
 
       # Sets up arel queries for the given params.
       # Anything not defined by a call to #searchable will be ignored.
-      def search(params)
-        params ||= {}
-        params.slice(*searchables).each do |name, value|
+      def search(all_params)
+        relevant_params = (all_params || {}).slice(*searchables)
+        scoped = self
+        relevant_params.each do |name, value|
           if column_names.include?(name.to_s)
-            where(name => value)
+            scoped = scoped.where(name => value)
           else
-            send(name, value)
+            scoped = scoped.send(name, value)
           end
         end
+        Winnow::FormObject.new(scoped, relevant_params)
       end
     end
   end
