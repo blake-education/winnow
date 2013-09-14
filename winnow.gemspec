@@ -19,5 +19,6 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 3.2.13"
 
   s.add_development_dependency "debugger"
+  s.add_development_dependency "rspec-rails"
   s.add_development_dependency "sqlite3"
 end
