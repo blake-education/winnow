@@ -1,5 +1,5 @@
 module Winnow
-  class FormObject < Struct.new(:model, :params)
+  class FormObject < Struct.new(:klass, :scope, :params)
     def self.model_name
       ActiveModel::Name.new(self).tap do |name|
         name.instance_variable_set("@param_key", "search")
@@ -16,12 +16,12 @@ module Winnow
       # Calculations
       :count, :average, :minimum, :maximum, :sum
     ]
-    delegate *RELATION_METHODS + [:to => :model]
+    delegate *RELATION_METHODS + [:to => :scope]
 
     def initialize(*args)
       super(*args)
 
-      (model.searchables || {}).each do |name|
+      Winnow.searchables(klass).each do |name|
         (class << self; self; end).class_eval do
           define_method(name) { params[name] }
         end

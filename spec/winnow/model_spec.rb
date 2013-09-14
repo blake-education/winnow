@@ -73,7 +73,8 @@ describe Winnow::Model do
     it "should return a Winnow::FormObject" do
       obj = User.search(nil)
       obj.class.should eq Winnow::FormObject
-      obj.model.should eq User
+      obj.klass.should eq User
+      obj.klass.should eq User
       obj.params.should == {}
     end
   end
