@@ -1,8 +1,8 @@
 ENV["RAILS_ENV"] = "test"
 
 require File.expand_path("../dummy/config/environment.rb",  __FILE__)
-require "rails/test_help"
-require '<gemname>'
+require "debugger"
+require "winnow"
 
 Rails.backtrace_cleaner.remove_silencers!
 
@@ -12,5 +12,5 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
 
-  config.order = 'random'
+  config.order = "random"
 end
