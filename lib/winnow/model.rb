@@ -25,6 +25,7 @@ module Winnow
       # Sets up arel queries for the given params.
       # Anything not defined by a call to #searchable will be ignored.
       def search(params)
+        params ||= {}
         params.slice(*searchables).each do |name, value|
           if column_names.include?(name.to_s)
             where(name => value)

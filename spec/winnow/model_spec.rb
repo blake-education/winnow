@@ -64,5 +64,10 @@ describe Winnow::Model do
       User.should_not_receive(:where)
       User.search(email: "hal@eta.edu")
     end
+
+    it "should ignore any empty arrays" do
+      User.should_not_receive(:where)
+      User.search(nil)
+    end
   end
 end
