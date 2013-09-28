@@ -9,9 +9,9 @@ describe Winnow::Model do
       User.searchables.should eq [:name]
     end
 
-    it "should accept field names like" do
-      User.searchable(:name_like)
-      User.searchables.should eq [:name_like]
+    it "should accept field names contains" do
+      User.searchable(:name_contains)
+      User.searchables.should eq [:name_contains]
     end
 
     it "should accept scopes" do
@@ -57,10 +57,10 @@ describe Winnow::Model do
       User.search(name: "Don Gately")
     end
 
-    it "should set up contains conditions on any fields defined as like searchable" do
-      User.searchable(:name_like)
+    it "should set up contains conditions on any fields defined as contains searchable" do
+      User.searchable(:name_contains)
       User.should_receive(:where).with("users.name like ?", "%ate%").and_call_original
-      User.search(name_like: "ate")
+      User.search(name_contains: "ate")
     end
 
     it "should call all searchables if multiple params passed in" do

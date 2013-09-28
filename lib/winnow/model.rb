@@ -34,8 +34,8 @@ module Winnow
         relevant_params.each do |name, value|
           if column_names.include?(name.to_s)
             scoped = scoped.where(name => value)
-          elsif like_scopes.include?(name.to_s)
-            column = name.to_s.gsub("_like", "")
+          elsif contains_scopes.include?(name.to_s)
+            column = name.to_s.gsub("_contains", "")
             scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
@@ -50,12 +50,12 @@ module Winnow
 
       def accepted_name?(name)
         column_names.include?(name.to_s) ||
-          like_scopes.include?(name.to_s) ||
+          contains_scopes.include?(name.to_s) ||
           respond_to?(name)
       end
 
-      def like_scopes
-        @like_scopes ||= column_names.map { |name| "#{name}_like" }.flatten
+      def contains_scopes
+        @contains_scopes ||= column_names.map { |name| "#{name}_contains" }.flatten
       end
     end
   end
