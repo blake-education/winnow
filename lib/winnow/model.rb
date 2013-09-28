@@ -11,10 +11,7 @@ module Winnow
       # All methods, scopes and fields are disabled by default so folks
       # can't mess with params and call methods they shouldn't have access to.
       def searchable(*names)
-        found = names.select do |name|
-          column_names.include?(name.to_s) || respond_to?(name)
-        end
-
+        found = names.select { |name| accepted_name?(name) }
         missing = names - found
         if missing.any?
           str = missing.map { |s| ":#{s}" }.join(", ")
@@ -37,11 +34,28 @@ module Winnow
         relevant_params.each do |name, value|
           if column_names.include?(name.to_s)
             scoped = scoped.where(name => value)
-          else
+          elsif like_scopes.include?(name.to_s)
+            column = name.to_s.gsub("_like", "")
+            scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
+          elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
+          else
+            raise RuntimeError.new("Unknown searchable: #{name}")
           end
         end
         Winnow::FormObject.new(self, scoped, relevant_params)
+      end
+
+      private
+
+      def accepted_name?(name)
+        column_names.include?(name.to_s) ||
+          like_scopes.include?(name.to_s) ||
+          respond_to?(name)
+      end
+
+      def like_scopes
+        @like_scopes ||= column_names.map { |name| "#{name}_like" }.flatten
       end
     end
   end
