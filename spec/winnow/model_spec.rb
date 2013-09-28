@@ -10,8 +10,8 @@ describe Winnow::Model do
     end
 
     it "should accept scopes" do
-      User.searchable(:name_like)
-      User.searchables.should eq [:name_like]
+      User.searchable(:name_starts_with)
+      User.searchables.should eq [:name_starts_with]
     end
 
     it "should accept class methods" do
@@ -35,9 +35,9 @@ describe Winnow::Model do
 
   describe ".search" do
     it "should call any class methods defined as searchable" do
-      User.searchable(:name_like)
-      User.should_receive(:name_like).with("Joelle").and_call_original
-      User.search(name_like: "Joelle")
+      User.searchable(:name_starts_with)
+      User.should_receive(:name_starts_with).with("Joelle").and_call_original
+      User.search(name_starts_with: "Joelle")
     end
 
     it "should call any scopes defined as searchable" do

@@ -12,17 +12,17 @@ describe Winnow::FormObject do
 
     it "should set up methods for any params passed in" do
       # form_for will call these methods, so need to define them
-      User.searchable(:name_like, :email_from)
-      obj = Winnow::FormObject.new(User, User, name_like: "A", email_from: "B")
-      obj.name_like.should eq "A"
+      User.searchable(:name_starts_with, :email_from)
+      obj = Winnow::FormObject.new(User, User, name_starts_with: "A", email_from: "B")
+      obj.name_starts_with.should eq "A"
       obj.email_from.should eq "B"
     end
 
     it "should not set up methods for any non-searchable params" do
       # form_for will call these methods, so need to define them
-      User.searchable(:name_like)
-      obj = Winnow::FormObject.new(User, User, name_like: "A", email_from: "B")
-      obj.name_like.should eq "A"
+      User.searchable(:name_starts_with)
+      obj = Winnow::FormObject.new(User, User, name_starts_with: "A", email_from: "B")
+      obj.name_starts_with.should eq "A"
       obj.respond_to?(:email_from).should be_false
     end
   end
