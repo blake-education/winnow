@@ -53,13 +53,13 @@ describe Winnow::Model do
 
     it "should set up equality conditions on any fields defined as searchable" do
       User.searchable(:name)
-      User.should_receive(:where).with(name: "Don Gately").and_call_original
+      ActiveRecord::Relation.any_instance.should_receive(:where).with(name: "Don Gately")
       User.search(name: "Don Gately")
     end
 
     it "should set up contains conditions on any fields defined as contains searchable" do
       User.searchable(:name_contains)
-      User.should_receive(:where).with("users.name like ?", "%ate%").and_call_original
+      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "%ate%")
       User.search(name_contains: "ate")
     end
 
@@ -90,7 +90,7 @@ describe Winnow::Model do
 
     it "should ignore any blank parameters" do
       User.searchable(:name, :email)
-      User.should_receive(:where).with(email: "mario@eta.edu")
+      ActiveRecord::Relation.any_instance.should_receive(:where).with(email: "mario@eta.edu")
       User.search(name: "", email: "mario@eta.edu")
     end
 
