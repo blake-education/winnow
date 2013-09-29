@@ -81,6 +81,12 @@ describe Winnow::Model do
       User.search(nil)
     end
 
+    it "should ignore any blank parameters" do
+      User.searchable(:name, :email)
+      User.should_receive(:where).with(email: "mario@eta.edu")
+      User.search(name: "", email: "mario@eta.edu")
+    end
+
     it "should return a Winnow::FormObject" do
       obj = User.search(nil)
       obj.class.should eq Winnow::FormObject
