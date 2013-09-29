@@ -31,7 +31,7 @@ module Winnow
         relevant_params = (all_params || {}).slice(*searchables)
         searchable_params = relevant_params.select { |k, v| v.present? }
 
-        scoped = self
+        scoped = self.scoped
         searchable_params.each do |name, value|
           if column_names.include?(name.to_s)
             scoped = scoped.where(name => value)

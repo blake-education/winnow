@@ -70,6 +70,13 @@ describe Winnow::Model do
       User.search(email_from: "Incand", email: "hal@eta.edu")
     end
 
+    it "should include any previous scopes in the query" do
+      User.searchable(:email)
+      scope = User.where(name: "Hal").search(email: "hal@eta.edu").scope
+      # TOFIX is there a better way to test this?
+      scope.to_sql.should include %Q{WHERE "users"."name" = 'Hal' AND "users"."email" = 'hal@eta.edu'}
+    end
+
     it "should ignore any non-searchable parameters" do
       User.searchable(:name)
       User.should_not_receive(:where)
