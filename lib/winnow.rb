@@ -11,4 +11,13 @@ module Winnow
     @searchables ||= {}
     @searchables[klass] = params
   end
+
+  def self.boolean(value)
+    return false if value == 'false'
+    !!value
+  end
+
+  def self.boolean_column?(column)
+    column && column.type == :boolean
+  end
 end

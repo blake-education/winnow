@@ -70,6 +70,40 @@ describe Winnow::Model do
       User.search(email_from: "Incand", email: "hal@eta.edu")
     end
 
+    context 'with boolean columns' do
+      before { User.searchable(:awesome) }
+
+      it "should convert 'true' to true" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: true).and_call_original
+        User.search(awesome: 'true')
+      end
+
+      it "should convert 'false' to false" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: false).and_call_original
+        User.search(awesome: 'false')
+      end
+
+      it "should handle true as you'd expect" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: true).and_call_original
+        User.search(awesome: true)
+      end
+
+      it "should handle false as you'd expect" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: false).and_call_original
+        User.search(awesome: false)
+      end
+
+      it "should convert nil to false" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: false).and_call_original
+        User.search(awesome: nil)
+      end
+
+      it "should convert truthy to true" do
+        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: true).and_call_original
+        User.search(awesome: 'whatever')
+      end
+    end
+
     it "should include any previous scopes in the query" do
       User.searchable(:email)
       scope = User.where(name: "Hal").search(email: "hal@eta.edu").scope

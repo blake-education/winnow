@@ -6,7 +6,7 @@ module Winnow
       end
     end
 
-    # c/o meta_seach
+    # c/o meta_search
     RELATION_METHODS = [
       # Query construction
       :joins, :includes, :select, :order, :where, :having, :group,
