@@ -29,12 +29,15 @@ module Winnow
       # Anything not defined by a call to #searchable will be ignored.
       def search(all_params)
         relevant_params = (all_params || {}).slice(*searchables)
-        searchable_params = relevant_params.select { |k, v| v.present? }
+        searchable_params = relevant_params.select do |name, v|
+          Winnow.boolean_column?(columns_hash[name.to_s]) || v.present?
+        end
 
         scoped = self.scoped
         searchable_params.each do |name, value|
           if column_names.include?(name.to_s)
-            scoped = scoped.where(name => value)
+            val = columns_hash[name.to_s].type == :boolean ? Winnow.boolean(value) : value
+            scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
             column = name.to_s.gsub("_contains", "")
             scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
