@@ -29,9 +29,7 @@ module Winnow
       # Anything not defined by a call to #searchable will be ignored.
       def search(all_params)
         relevant_params = (all_params || {}).slice(*searchables)
-        searchable_params = relevant_params.select do |name, v|
-          Winnow.boolean_column?(columns_hash[name.to_s]) || v.present?
-        end
+        searchable_params = relevant_params.select {|name, v| v.to_s.present? }
 
         scoped = self.scoped
         searchable_params.each do |name, value|

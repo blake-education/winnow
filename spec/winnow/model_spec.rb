@@ -93,8 +93,8 @@ describe Winnow::Model do
         User.search(awesome: false)
       end
 
-      it "should convert nil to false" do
-        ActiveRecord::Relation.any_instance.should_receive(:where).with(awesome: false).and_call_original
+      it "should ignore nil" do
+        User.should_not_receive(:where)
         User.search(awesome: nil)
       end
 
