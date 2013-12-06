@@ -93,10 +93,11 @@ describe Winnow::Model do
         User.search(awesome: false)
       end
 
-      it "should ignore nil" do
+      it "should ignore falsy values (except false)" do
         User.should_not_receive(:where)
         ActiveRecord::Relation.any_instance.should_not_receive(:where)
         User.search(awesome: nil)
+        User.search(awesome: '')
       end
 
       it "should convert truthy to true" do
