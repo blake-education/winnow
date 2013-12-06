@@ -95,6 +95,7 @@ describe Winnow::Model do
 
       it "should ignore nil" do
         User.should_not_receive(:where)
+        ActiveRecord::Relation.any_instance.should_not_receive(:where)
         User.search(awesome: nil)
       end
 
