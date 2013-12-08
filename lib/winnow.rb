@@ -16,8 +16,4 @@ module Winnow
     return false if value == 'false'
     !!value
   end
-
-  def self.boolean_column?(column)
-    column && column.type == :boolean
-  end
 end
