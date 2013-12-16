@@ -9,12 +9,15 @@ module Winnow
     # c/o meta_search
     RELATION_METHODS = [
       # Query construction
-      :joins, :includes, :select, :order, :where, :having, :group,
+      :joins, :includes, :select, :order, :where, :having,
+      :group, :limit, :distinct,
       # Results, debug, array methods
-      :to_a, :all, :length, :size, :to_sql, :debug_sql, :paginate, :page,
-      :find_each, :first, :last, :each, :arel, :in_groups_of, :group_by,
+      :to_a, :all, :length, :size, :to_sql, :debug_sql, :find_each,
+      :first, :last, :each, :arel, :in_groups_of, :group_by,
       # Calculations
-      :count, :average, :minimum, :maximum, :sum
+      :count, :average, :minimum, :maximum, :sum,
+      # Pagination
+      :paginate, :page, :per_page
     ]
     delegate *RELATION_METHODS + [:to => :scope]
 
