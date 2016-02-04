@@ -26,6 +26,8 @@ module Winnow
 
       Winnow.searchables(klass).each do |name|
         (class << self; self; end).class_eval do
+          extend ActiveModel::Naming
+
           define_method(name) { params[name] }
         end
       end
