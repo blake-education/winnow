@@ -8,4 +8,4 @@ gemfile:
   - gemfiles/rails42.gemfile
 notifications:
   email:
-    - brad@lucky-dip.net
+    - dev@blake.com.au
