@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", ">= 3.0.0"
 
-  s.add_development_dependency "debugger"
+  s.add_development_dependency "pry-byebug"
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "appraisal"
