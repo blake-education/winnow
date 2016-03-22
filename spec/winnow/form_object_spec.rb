@@ -23,7 +23,7 @@ describe Winnow::FormObject do
       User.searchable(:name_starts_with)
       obj = Winnow::FormObject.new(User, User, name_starts_with: "A", email_from: "B")
       obj.name_starts_with.should eq "A"
-      obj.respond_to?(:email_from).should be_false
+      obj.respond_to?(:email_from).should eq false
     end
   end
 
