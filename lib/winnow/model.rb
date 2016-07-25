@@ -38,7 +38,7 @@ module Winnow
             scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
             column = name.to_s.gsub("_contains", "")
-            scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
+            scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
           else
