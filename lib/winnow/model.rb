@@ -28,6 +28,7 @@ module Winnow
       # Sets up arel queries for the given params.
       # Anything not defined by a call to #searchable will be ignored.
       def search(all_params)
+        binding.pry
         relevant_params = (all_params || {}).slice(*searchables)
         searchable_params = relevant_params.select {|name, v| v.to_s.present? }
 
@@ -56,6 +57,7 @@ module Winnow
       def accepted_name?(name)
         column_names.include?(name.to_s) ||
           contains_scopes.include?(name.to_s) ||
+          starts_with_scopes.include?(name.to_s) ||
           respond_to?(name)
       end
 
