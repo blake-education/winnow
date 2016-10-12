@@ -59,8 +59,14 @@ describe Winnow::Model do
 
     it "should set up contains conditions on any fields defined as contains searchable" do
       User.searchable(:name_contains)
-      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "ate%")
+      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "%ate%")
       User.search(name_contains: "ate")
+    end
+
+    it "should set up starts_with conditions on any fields defined as starts_with searchable" do
+      User.searchable(:name_starts_with)
+      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "Pete%")
+      User.search(name_contains: "Pete")
     end
 
     it "should call all searchables if multiple params passed in" do
