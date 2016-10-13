@@ -41,7 +41,7 @@ describe Winnow::Model do
   describe ".search" do
     it "should call any class methods defined as searchable" do
       User.searchable(:name_starts_with)
-      User.should_receive(:name_starts_with).with("Joelle").and_call_original
+      User.should_receive(:name_starts_with).with("Joelle")
       User.search(name_starts_with: "Joelle")
     end
 
