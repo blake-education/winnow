@@ -15,7 +15,7 @@ module Winnow
         missing = names - found
         if missing.any?
           str = missing.map { |s| ":#{s}" }.join(", ")
-          raise RuntimeError.new("Unknown searchable: #{str}")
+          raise_error(str)
         else
           Winnow.add_searchable(self, names)
         end
@@ -45,7 +45,7 @@ module Winnow
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
           else
-            raise RuntimeError.new("Unknown searchable: #{name}")
+            raise_error(name)
           end
         end
         Winnow::FormObject.new(self, scoped, relevant_params)
@@ -66,6 +66,14 @@ module Winnow
 
       def contains_scopes
         @contains_scopes ||= column_names.map { |name| "#{name}_contains" }.flatten
+      end
+
+      def raise_error(str)
+        if Rails.env.test?
+          puts "\n\n\n\n\nERROR: Unknown searchable: #{str}\n\n\n\n\n"
+        else
+          raise RuntimeError.new("Unknown searchable: #{str}")
+        end
       end
     end
   end
