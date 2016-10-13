@@ -60,12 +60,12 @@ module Winnow
           respond_to?(name)
       end
 
-      def starts_with_scopes
-        @starts_with_scopes ||= column_names.map { |name| "#{name}_starts_with" }.flatten
-      end
-
       def contains_scopes
         @contains_scopes ||= column_names.map { |name| "#{name}_contains" }.flatten
+      end
+
+      def starts_with_scopes
+        @starts_with_scopes ||= column_names.map { |name| "#{name}_starts_with" }.flatten
       end
     end
   end

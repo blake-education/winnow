@@ -64,8 +64,8 @@ describe Winnow::Model do
     end
 
     it "should set up starts_with conditions on any fields defined as starts_with searchable" do
-      User.searchable(:name_starts_with)
-      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "Pete%")
+      User.searchable(:login_starts_with)
+      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.login like ?", "Pete%")
       User.search(name_contains: "Pete")
     end
 
