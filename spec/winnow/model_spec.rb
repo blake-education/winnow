@@ -59,7 +59,7 @@ describe Winnow::Model do
 
     it "should set up contains conditions on any fields defined as contains searchable" do
       User.searchable(:name_contains)
-      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "ate%")
+      ActiveRecord::Relation.any_instance.should_receive(:where).with("users.name like ?", "%ate%")
       User.search(name_contains: "ate")
     end
 

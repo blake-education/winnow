@@ -28,6 +28,7 @@ module Winnow
       # Sets up arel queries for the given params.
       # Anything not defined by a call to #searchable will be ignored.
       def search(all_params)
+        fts_indexes = fts_indexes_for_table
         relevant_params = (all_params || {}).slice(*searchables)
         searchable_params = relevant_params.select {|name, v| v.to_s.present? }
 
@@ -37,8 +38,12 @@ module Winnow
             val = columns_hash[name.to_s].type == :boolean ? Winnow.boolean(value) : value
             scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
-            column = name.to_s.gsub("_contains", "")
-            scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
+            column  = name.to_s.gsub("_contains", "")
+            if fts_adapter == :mysql && fts_indexes.find {|index| index.columns.include?(column)}
+              scoped = scoped.where("MATCH(#{table_name}.#{column}) AGAINST(?)", value)
+            else
+              scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
+            end
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
           else
@@ -49,6 +54,21 @@ module Winnow
       end
 
       private
+
+      def fts_adapter
+        case connection.adapter_name
+        when /mysql/i
+          :mysql
+        when /postgres/i
+          :postgres
+        else
+          nil
+        end
+      end
+
+      def fts_indexes_for_table
+        @fts_indexes ||= connection.indexes(table_name).select {|idx| idx.type == :fulltext}
+      end
 
       def accepted_name?(name)
         column_names.include?(name.to_s) ||
