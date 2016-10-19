@@ -67,7 +67,7 @@ module Winnow
       end
 
       def fts_indexes_for_table
-        @fts_indexes ||= connection.indexes(table_name).select {|idx| idx.type == :fulltext}
+        connection.indexes(table_name).select {|idx| idx.type == :fulltext}
       end
 
       def accepted_name?(name)

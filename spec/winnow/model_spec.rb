@@ -137,5 +137,26 @@ describe Winnow::Model do
       expect(obj.klass).to eq User
       expect(obj.params).to eq({})
     end
+
+    context 'mysql full-text search' do
+      before do
+        allow(User.connection).to receive(:adapter_name) { 'Mysql2' }
+        User.searchable(:name_contains)
+      end
+
+      it 'should use full-text search when index is available' do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type).new(['name'], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(?)", "test")
+        User.search(name_contains: "test")
+      end
+
+      it 'should default to wild-card LIKE searches when index is not present' do
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "%test%")
+        User.search(name_contains: "test")
+      end
+    end
   end
 end
