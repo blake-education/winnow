@@ -40,7 +40,9 @@ module Winnow
           elsif contains_scopes.include?(name.to_s)
             column  = name.to_s.gsub("_contains", "")
             if fts_adapter == :mysql && fts_indexes.find {|index| index.columns.include?(column)}
-              scoped = scoped.where("MATCH(#{table_name}.#{column}) AGAINST(?)", value)
+              # strip out boolean search ops, we do not want to expose the boolean search mode.
+              value  = value.gsub(%r{[-+*]}, '')
+              scoped = scoped.where("MATCH(#{table_name}.#{column}) AGAINST(? IN BOOLEAN MODE)", "#{value}*")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
             end

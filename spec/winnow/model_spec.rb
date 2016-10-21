@@ -149,8 +149,17 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(['name'], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(?)", "test")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(? IN BOOLEAN MODE)", "test*")
         User.search(name_contains: "test")
+      end
+
+      it 'should strip out boolean search operators from search term' do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type).new(['name'], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(? IN BOOLEAN MODE)", "test*")
+        User.search(name_contains: "+-test*")
       end
 
       it 'should default to wild-card LIKE searches when index is not present' do
