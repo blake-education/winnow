@@ -150,12 +150,16 @@ describe Winnow::Model do
         User.searchable(:name_contains)
       end
 
+      let(:fts_scope) do
+        "(match(users.name) against(? in boolean mode) and (users.name like ?))"
+      end
+
       it 'should use full-text search when index is available' do
         allow(User.connection).to receive(:indexes) do
           [Struct.new(:columns, :type).new(['name'], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(? IN BOOLEAN MODE)", "test*")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test*", "%test%")
         User.search(name_contains: "test")
       end
 
@@ -164,8 +168,8 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(['name'], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("MATCH(users.name) AGAINST(? IN BOOLEAN MODE)", "test*")
-        User.search(name_contains: "+-test*")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "hello* test.com*", "%hello@test.com%")
+        User.search(name_contains: "hello@test.com")
       end
 
       it 'should default to wild-card LIKE searches when index is not present' do
