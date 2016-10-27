@@ -40,9 +40,9 @@ describe Winnow::Model do
 
   describe ".search" do
     it "should call any class methods defined as searchable" do
-      User.searchable(:name_starts_with)
-      expect(User).to receive(:name_starts_with).with("Joelle").and_call_original
-      User.search(name_starts_with: "Joelle")
+      User.searchable(:name_ends_with)
+      expect(User).to receive(:name_ends_with).with("Joelle").and_call_original
+      User.search(name_ends_with: "Joelle")
     end
 
     it "should call any scopes defined as searchable" do
@@ -61,6 +61,12 @@ describe Winnow::Model do
       User.searchable(:name_contains)
       expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "%ate%")
       User.search(name_contains: "ate")
+    end
+
+    it "should set up starts_with conditions on any fields defined as starts_with searchable" do
+      User.searchable(:name_starts_with)
+      expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "Pete%")
+      User.search(name_starts_with: "Pete")
     end
 
     it "should call all searchables if multiple params passed in" do

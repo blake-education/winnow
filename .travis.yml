@@ -11,4 +11,4 @@ gemfile:
   - gemfiles/rails4013.gemfile
 notifications:
   email:
-    - brad@lucky-dip.net
+    - dev@blake.com.au
