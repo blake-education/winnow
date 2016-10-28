@@ -28,7 +28,6 @@ module Winnow
       # Sets up arel queries for the given params.
       # Anything not defined by a call to #searchable will be ignored.
       def search(all_params)
-        fts_indexes = fts_indexes_for_table
         relevant_params = (all_params || {}).slice(*searchables)
         searchable_params = relevant_params.select {|name, v| v.to_s.present? }
 
@@ -38,22 +37,22 @@ module Winnow
             val = columns_hash[name.to_s].type == :boolean ? Winnow.boolean(value) : value
             scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
-            column  = name.to_s.gsub("_contains", "")
-            if fts_adapter == :mysql && fts_indexes.find {|index| index.columns.include?(column)}
+            column = name.to_s.gsub("_contains", "")
 
-              # since we're searching in boolean mode, strip out search operators and tokenize.
-              tokens = value.gsub(%r{[@~"<>{}()+*\-]+}, '* ')
-              tokens = "#{tokens}*".sub(%r{\* +\*+$}, '*')
-              scoped = scoped.where(
-                "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))",
-                tokens, "%#{value}%"
-              )
+            if mysql_adapter? && fts_index?(column)
+              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "%#{value}%")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
             end
           elsif starts_with_scopes.include?(name.to_s)
             column = name.to_s.gsub("_starts_with", "")
-            scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
+
+            # use full-text index to narrow down search if btree index is not available.
+            if mysql_adapter? && !btree_index?(column) && fts_index?(column)
+              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "#{value}%")
+            else
+              scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
+            end
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
           else
@@ -65,7 +64,11 @@ module Winnow
 
       private
 
-      def fts_adapter
+      def mysql_adapter?
+        connection_adapter == :mysql
+      end
+
+      def connection_adapter
         case connection.adapter_name
         when /mysql/i
           :mysql
@@ -76,8 +79,30 @@ module Winnow
         end
       end
 
+      def fts_scope_for(column)
+        "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))"
+      end
+
+      def fts_tokens_for(term)
+        # since we're searching in boolean mode, strip out search operators and tokenize.
+        tokens = term.gsub(%r{[@~"<>{}()+*\-]+}, '* ')
+        tokens = "#{tokens}*".sub(%r{\* +\*+$}, '*')
+      end
+
+      def fts_index?(column)
+        !!fts_indexes_for_table.find {|index| index.columns.include?(column)}
+      end
+
       def fts_indexes_for_table
         connection.indexes(table_name).select {|idx| idx.type == :fulltext}
+      end
+
+      def btree_index?(column)
+        !!btree_indexes_for_table.find {|index| index.columns[0] == column}
+      end
+
+      def btree_indexes_for_table
+        connection.indexes(table_name).select {|idx| idx.using == :btree}
       end
 
       def accepted_name?(name)
