@@ -14,23 +14,23 @@ describe Winnow::FormObject do
       # form_for will call these methods, so need to define them
       User.searchable(:name_starts_with, :email_from)
       obj = Winnow::FormObject.new(User, User, name_starts_with: "A", email_from: "B")
-      obj.name_starts_with.should eq "A"
-      obj.email_from.should eq "B"
+      expect(obj.name_starts_with).to eq "A"
+      expect(obj.email_from).to eq "B"
     end
 
     it "should not set up methods for any non-searchable params" do
       # form_for will call these methods, so need to define them
       User.searchable(:name_starts_with)
       obj = Winnow::FormObject.new(User, User, name_starts_with: "A", email_from: "B")
-      obj.name_starts_with.should eq "A"
-      obj.respond_to?(:email_from).should eq false
+      expect(obj.name_starts_with).to eq "A"
+      expect(obj.respond_to?(:email_from)).to eq false
     end
   end
 
   describe "#to_key" do
     it "should return nil" do
       # I don't really know why, but things fail if to_key is not defined
-      Winnow::FormObject.new(User, User, {}).to_key.should be_nil
+      expect(Winnow::FormObject.new(User, User, {}).to_key).to be_nil
     end
   end
 end

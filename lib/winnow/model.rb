@@ -38,10 +38,21 @@ module Winnow
             scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
             column = name.to_s.gsub("_contains", "")
-            scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
+
+            if mysql_adapter? && fts_index?(column)
+              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "%#{value}%")
+            else
+              scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
+            end
           elsif starts_with_scopes.include?(name.to_s)
             column = name.to_s.gsub("_starts_with", "")
-            scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
+
+            # use full-text index to narrow down search if btree index is not available.
+            if mysql_adapter? && !btree_index?(column) && fts_index?(column)
+              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "#{value}%")
+            else
+              scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
+            end
           elsif scoped.respond_to?(name)
             scoped = scoped.send(name, value)
           else
@@ -52,6 +63,47 @@ module Winnow
       end
 
       private
+
+      def mysql_adapter?
+        connection_adapter == :mysql
+      end
+
+      def connection_adapter
+        case connection.adapter_name
+        when /mysql/i
+          :mysql
+        when /postgres/i
+          :postgres
+        else
+          nil
+        end
+      end
+
+      def fts_scope_for(column)
+        "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))"
+      end
+
+      def fts_tokens_for(term)
+        # since we're searching in boolean mode, strip out search operators and tokenize.
+        tokens = term.gsub(%r{[@~"<>{}()+*\-]+}, '* ')
+        tokens = "#{tokens}*".sub(%r{\* +\*+$}, '*')
+      end
+
+      def fts_index?(column)
+        !!fts_indexes_for_table.find {|index| index.columns.include?(column)}
+      end
+
+      def fts_indexes_for_table
+        connection.indexes(table_name).select {|idx| idx.type == :fulltext}
+      end
+
+      def btree_index?(column)
+        !!btree_indexes_for_table.find {|index| index.columns[0] == column}
+      end
+
+      def btree_indexes_for_table
+        connection.indexes(table_name).select {|idx| idx.using == :btree}
+      end
 
       def accepted_name?(name)
         column_names.include?(name.to_s) ||
