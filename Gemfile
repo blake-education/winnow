@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 group :development, :test do
-  gem 'rails', '~> 5.0.1'
+  gem 'rails', '~> 5.1.0'
   gem 'sqlite3', '~> 1.3.6'
   gem 'rspec-rails'
   gem 'appraisal'
