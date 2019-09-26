@@ -22,14 +22,15 @@ module Winnow
   end
 
   def self.choose_base_scope_method
-    if rails_four?
+    if rails_has_all?
       :all
     else
       :scoped
     end
   end
 
-  def self.rails_four?
-    defined?(ActiveRecord::VERSION::STRING) && ActiveRecord::VERSION::STRING =~ /^4/
+  def self.rails_has_all?
+    defined?(ActiveRecord::VERSION::STRING) && 
+      (ActiveRecord::VERSION::STRING =~ /^4/  || ActiveRecord::VERSION::STRING =~ /^5/)
   end
 end
