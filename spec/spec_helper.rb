@@ -1,6 +1,6 @@
-ENV["RAILS_ENV"] = "test"
+ENV["RAILS_ENV"] = 'test'
 
-require File.expand_path("../dummy/config/environment.rb",  __FILE__)
+require File.join(__dir__, 'dummy/config/environment.rb')
 require "winnow"
 
 Rails.backtrace_cleaner.remove_silencers!
