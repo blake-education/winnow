@@ -1,14 +1,13 @@
 language: ruby
 rvm:
-  - 2.0.0
-  - 2.1.2
+  - 2.5.1
 before_install:
-  - gem install bundler
+  - gem update --system
+  - gem install bundler -v "~> 1.17.3"
 before_script:
-  cd spec/dummy && rake db:test:load && cd ../..
+  cd spec/dummy && bundle exec rake db:test:load && cd ../..
 gemfile:
-  - gemfiles/rails40.gemfile
-  - gemfiles/rails4013.gemfile
+  - Gemfile
 notifications:
   email:
     - dev@blake.com.au

@@ -1,5 +1,6 @@
 module Winnow
   class FormObject < Struct.new(:klass, :scope, :params)
+
     def self.model_name
       ActiveModel::Name.new(self).tap do |name|
         name.instance_variable_set("@param_key", "search")
@@ -26,6 +27,8 @@ module Winnow
 
       Winnow.searchables(klass).each do |name|
         (class << self; self; end).class_eval do
+          extend ActiveModel::Naming
+
           define_method(name) { params[name] }
         end
       end
