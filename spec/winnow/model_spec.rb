@@ -159,7 +159,7 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test*", "%test%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "", "%test%")
         User.search(name_contains: "test")
       end
 
@@ -168,7 +168,7 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "hello* test.com*", "%hello@test.com%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test.com*", "%hello@test.com%")
         User.search(name_contains: "hello@test.com")
       end
 
@@ -191,6 +191,15 @@ describe Winnow::Model do
 
         expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test*", "test%")
         User.search(name_starts_with: "test")
+      end
+
+      it "should use a full-text index if available to perform starts_with searches and should use '+' in the token string" do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type, :using).new(["email"], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "hello* +test.com*", "hello@test.com%")
+        User.search(email_starts_with: "hello@test.com")
       end
 
       it "should use btree indexes for starts_with searches." do
