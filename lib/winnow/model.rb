@@ -83,7 +83,7 @@ module Winnow
         "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))"
       end
 
-      SPECIAL_CHARS = %r{[@~"<>{}()+*\-]+}
+      SPECIAL_CHARS = %r{[@~"<>{}()+*\-\s]+}
 
       def fts_starts_with_tokens_for(term)
         term.split(SPECIAL_CHARS).each_with_object([]) do |token, a|
