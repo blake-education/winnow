@@ -168,7 +168,7 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test.com*", "%hello@test.com%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+test.com*", "%hello@test.com%")
         User.search(name_contains: "hello@test.com")
       end
 
@@ -189,7 +189,7 @@ describe Winnow::Model do
           [Struct.new(:columns, :type, :using).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "test*", "test%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+test*", "test%")
         User.search(name_starts_with: "test")
       end
 
@@ -198,7 +198,7 @@ describe Winnow::Model do
           [Struct.new(:columns, :type, :using).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "hello* +test.com*", "hello@test.com%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+hello* +test.com*", "hello@test.com%")
         User.search(name_starts_with: "hello@test.com")
       end
 

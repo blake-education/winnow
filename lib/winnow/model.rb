@@ -86,15 +86,15 @@ module Winnow
       SPECIAL_CHARS = %r{[@~"<>{}()+*\-]+}
 
       def fts_starts_with_tokens_for(term)
-        # since we're searching in boolean mode, strip out search operators and tokenize.
-        tokens = term.gsub(SPECIAL_CHARS, '* +')
-        tokens = "#{tokens}*".sub(%r{\* +\*+$}, '*')
+        term.split(SPECIAL_CHARS).each_with_object([]) do |token, a|
+          a << ('+' + token + '*') unless token.empty?
+        end.join(' ')
       end
 
       def fts_contains_tokens_for(term)
         term.split(SPECIAL_CHARS)[1..-1].each_with_object([]) do |token, a|
-          a << (token + '*') unless token.empty?
-        end.join(' +')
+          a << ('+' + token + '*') unless token.empty?
+        end.join(' ')
       end
 
       def fts_index?(column)
