@@ -40,7 +40,7 @@ module Winnow
             column = name.to_s.gsub("_contains", "")
 
             if mysql_adapter? && fts_index?(column)
-              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "%#{value}%")
+              scoped = scoped.where(fts_scope_for(column), fts_contains_tokens_for(value), "%#{value}%")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
             end
@@ -49,7 +49,7 @@ module Winnow
 
             # use full-text index to narrow down search if btree index is not available.
             if mysql_adapter? && !btree_index?(column) && fts_index?(column)
-              scoped = scoped.where(fts_scope_for(column), fts_tokens_for(value), "#{value}%")
+              scoped = scoped.where(fts_scope_for(column), fts_starts_with_tokens_for(value), "#{value}%")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
             end
@@ -83,10 +83,18 @@ module Winnow
         "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))"
       end
 
-      def fts_tokens_for(term)
-        # since we're searching in boolean mode, strip out search operators and tokenize.
-        tokens = term.gsub(%r{[@~"<>{}()+*\-]+}, '* ')
-        tokens = "#{tokens}*".sub(%r{\* +\*+$}, '*')
+      SPECIAL_CHARS = %r{[@~"<>{}()+*\-\s]+}
+
+      def fts_starts_with_tokens_for(term)
+        term.split(SPECIAL_CHARS).each_with_object([]) do |token, a|
+          a << ('+' + token + '*') unless token.empty?
+        end.join(' ')
+      end
+
+      def fts_contains_tokens_for(term)
+        term.split(SPECIAL_CHARS)[1..-1].each_with_object([]) do |token, a|
+          a << ('+' + token + '*') unless token.empty?
+        end.join(' ')
       end
 
       def fts_index?(column)
