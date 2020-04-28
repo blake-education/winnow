@@ -83,18 +83,29 @@ module Winnow
         "(match(#{table_name}.#{column}) against(? in boolean mode) and (#{table_name}.#{column} like ?))"
       end
 
-      SPECIAL_CHARS = %r{[@~"<>{}()+*\-\s]+}
-
       def fts_starts_with_tokens_for(term)
-        term.split(SPECIAL_CHARS).each_with_object([]) do |token, a|
-          a << ('+' + token + '*') unless token.empty?
-        end.join(' ')
+        tokens = token_list(term)
+        tokens_to_search_term(tokens)
       end
 
       def fts_contains_tokens_for(term)
-        term.split(SPECIAL_CHARS)[1..-1].each_with_object([]) do |token, a|
-          a << ('+' + token + '*') unless token.empty?
-        end.join(' ')
+        tokens = token_list(term)[1..-1]
+        tokens_to_search_term(tokens)
+      end
+
+      SPECIAL_CHARS = %r{[@~"<>{}()+*.\-\s]+}
+
+      # ActiveRecord::Base.connection.execute('SELECT * FROM INFORMATION_SCHEMA.INNODB_FT_DEFAULT_STOPWORD').to_a.sum
+      STOP_WORDS = %w{a about an are as at be by com de en for from how i in is it la of on or that the this to was what when where who will with und the www}
+
+      FT_MIN_TOKEN_SIZE = 3
+
+      def token_list(term)
+        (term.split(SPECIAL_CHARS) - STOP_WORDS).select { |s| s.length >= FT_MIN_TOKEN_SIZE }
+      end
+
+      def tokens_to_search_term(tokens)
+        tokens.map {|a| '+' + a + '*'}.join(' ')
       end
 
       def fts_index?(column)
