@@ -48,7 +48,7 @@ module Winnow
             column = name.to_s.gsub("_starts_with", "")
 
             # use full-text index to narrow down search if btree index is not available.
-            if mysql_adapter? && !btree_index?(column) && fts_index?(column)
+            if mysql_adapter? && !btree_index?(column) && fts_index?(column) && (! fts_starts_with_tokens_for(value).empty?)
               scoped = scoped.where(fts_scope_for(column), fts_starts_with_tokens_for(value), "#{value}%")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "#{value}%")
