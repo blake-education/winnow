@@ -210,6 +210,15 @@ describe Winnow::Model do
         expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "test%")
         User.search(name_starts_with: "test")
       end
+
+      it "should use a simple starts with query if tokens are empty" do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type, :using).new(["name"], nil, :btree)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "In%")
+        User.search(name_starts_with: "In")
+      end
     end
   end
 end
