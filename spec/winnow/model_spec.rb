@@ -159,7 +159,16 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "", "%test%")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+test*", "%example test%")
+        User.search(name_contains: "example test")
+      end
+
+      it "should not use full-text search if there are not search terms" do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type).new(["name"], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "%test%")
         User.search(name_contains: "test")
       end
 
