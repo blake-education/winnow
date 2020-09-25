@@ -11,4 +11,5 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'appraisal'
   gem 'pry'
+  gem 'listen'
 end
