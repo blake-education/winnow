@@ -7,6 +7,7 @@ before_script:
   cd spec/dummy && rake db:test:load && cd ../..
 gemfile:
   - gemfiles/rails42.gemfile
+  - gemfiles/rails52.gemfile
 notifications:
   email:
     - dev@blake.com.au
