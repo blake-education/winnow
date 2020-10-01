@@ -2,7 +2,7 @@
 
 # Winnow
 
-An [AREL](https://github.com/rails/arel/tree/6-0-stable) based search solution for Rails.
+An [AREL](https://github.com/rails/arel/tree/v6.0.4) based search solution for Rails.
 
 =
 
