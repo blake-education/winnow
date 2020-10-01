@@ -3,11 +3,13 @@ rvm:
   - 2.5.1
 before_install:
   - gem update --system
-  - gem install bundler -v "~> 1.17.3"
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
 before_script:
   cd spec/dummy && bundle exec rake db:test:load && cd ../..
 gemfile:
-  - Gemfile
+  - gemfiles/rails42.gemfile
+  - gemfiles/rails52.gemfile
 notifications:
   email:
     - dev@blake.com.au

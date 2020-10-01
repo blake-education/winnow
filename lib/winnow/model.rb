@@ -31,7 +31,7 @@ module Winnow
         relevant_params = (all_params || {}).slice(*searchables)
         searchable_params = relevant_params.select {|name, v| v.to_s.present? }
 
-        scoped = self.send(Winnow.base_scope_method)
+        scoped = all
         searchable_params.each do |name, value|
           if column_names.include?(name.to_s)
             val = columns_hash[name.to_s].type == :boolean ? Winnow.boolean(value) : value
