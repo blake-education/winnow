@@ -38,8 +38,7 @@ module Winnow
             scoped = scoped.where(name => val)
           elsif contains_scopes.include?(name.to_s)
             column = name.to_s.gsub("_contains", "")
-
-            if mysql_adapter? && fts_index?(column)
+            if mysql_adapter? && fts_index?(column) && (!fts_contains_tokens_for(value).empty?)
               scoped = scoped.where(fts_scope_for(column), fts_contains_tokens_for(value), "%#{value}%")
             else
               scoped = scoped.where("#{table_name}.#{column} like ?", "%#{value}%")
@@ -105,7 +104,7 @@ module Winnow
       end
 
       def tokens_to_search_term(tokens)
-        tokens.map {|a| '+' + a + '*'}.join(' ')
+        tokens.to_a.map {|a| '+' + a + '*'}.join(' ')
       end
 
       def fts_index?(column)
