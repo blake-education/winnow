@@ -159,8 +159,8 @@ describe Winnow::Model do
           [Struct.new(:columns, :type).new(["name"], :fulltext)]
         end
 
-        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "", "%test%")
-        User.search(name_contains: "test")
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+bar*", "%test bar%")
+        User.search(name_contains: "test bar")
       end
 
       it "should strip out boolean search operators from search term" do
@@ -175,6 +175,24 @@ describe Winnow::Model do
       it "should default to wild-card LIKE searches when index is not present" do
         expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "%test%")
         User.search(name_contains: "test")
+      end
+
+      it "should use full-text search when index is available" do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type).new(["name"], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with(fts_scope, "+bar*", "%test bar%")
+        User.search(name_contains: "test bar")
+      end
+
+      it "should not use for stop words" do
+        allow(User.connection).to receive(:indexes) do
+          [Struct.new(:columns, :type).new(["name"], :fulltext)]
+        end
+
+        expect_any_instance_of(ActiveRecord::Relation).to receive(:where).with("users.name like ?", "%an the%")
+        User.search(name_contains: "an the")
       end
     end
 
