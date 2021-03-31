@@ -6,9 +6,9 @@ source "https://rubygems.org"
 gemspec
 
 group :development, :test do
-  gem 'rails', '~> 5.2.3'
+  gem 'rails', '~> 6.1.0'
   gem "sprockets", "~> 3.7"
-  gem 'sqlite3', '~> 1.3.6'
+  gem 'sqlite3', '~> 1.4.0'
   gem "mysql2"
   gem 'rspec-rails'
   gem 'appraisal'
