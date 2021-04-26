@@ -10,6 +10,8 @@ before_script:
 gemfile:
   - gemfiles/rails42.gemfile
   - gemfiles/rails52.gemfile
+  - gemfiles/rails61.gemfile
+
 notifications:
   email:
     - dev@blake.com.au
