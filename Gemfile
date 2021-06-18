@@ -6,12 +6,12 @@ source "https://rubygems.org"
 gemspec
 
 group :development, :test do
-  gem 'rails', '~> 6.1.0'
-  gem "sprockets", "~> 3.7"
-  gem 'sqlite3', '~> 1.4.0'
-  gem "mysql2"
-  gem 'rspec-rails'
   gem 'appraisal'
-  gem 'pry'
   gem 'listen'
+  gem 'mysql2'
+  gem 'pry'
+  gem 'rails', '~> 6.1.0'
+  gem 'rspec-rails'
+  gem 'sprockets', "~> 3.7"
+  gem 'sqlite3', '~> 1.4.0'
 end
