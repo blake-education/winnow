@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.5.1
+  - 2.7.2
 before_install:
   - gem update --system
   - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
