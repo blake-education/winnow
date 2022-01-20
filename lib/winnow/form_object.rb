@@ -20,7 +20,7 @@ module Winnow
       # Pagination
       :paginate, :page, :per_page
     ]
-    delegate *RELATION_METHODS + [:to => :scope]
+    delegate *RELATION_METHODS, to: :scope
 
     def initialize(*args)
       super(*args)

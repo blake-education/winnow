@@ -10,7 +10,6 @@ group :development, :test do
   gem 'listen'
   gem 'mysql2'
   gem 'pry'
-  gem 'rails', '~> 6.1.0'
   gem 'rspec-rails'
   gem 'sprockets', "~> 3.7"
   gem 'sqlite3', '~> 1.4.0'
