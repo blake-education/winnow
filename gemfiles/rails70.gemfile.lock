@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: ..
   specs:
     winnow (0.0.1)
       rails (>= 3.0.0, < 7.1.0)
@@ -100,7 +100,6 @@ GEM
     marcel (1.0.2)
     method_source (1.0.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.7.1)
     minitest (5.15.0)
     mysql2 (0.5.3)
     net-imap (0.2.3)
@@ -119,8 +118,7 @@ GEM
       net-protocol
       timeout
     nio4r (2.5.8)
-    nokogiri (1.13.1)
-      mini_portile2 (~> 2.7.0)
+    nokogiri (1.13.1-x86_64-darwin)
       racc (~> 1.4)
     pry (0.14.1)
       coderay (~> 1.1)
@@ -191,13 +189,14 @@ GEM
     zeitwerk (2.5.3)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-19
 
 DEPENDENCIES
   appraisal
   listen
   mysql2
   pry
+  rails (~> 7.0.1)
   rspec-rails
   sprockets (~> 3.7)
   sqlite3 (~> 1.4.0)
