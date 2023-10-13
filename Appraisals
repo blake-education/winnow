@@ -1,7 +1,7 @@
-appraise "rails61" do
-  gem "rails", "~> 6.1.0"
+appraise "rails70" do
+  gem "rails", "~> 7.0.1"
 end
 
 appraise "rails70" do
-  gem "rails", "~> 7.0.1"
+  gem "rails", "~> 7.1.0"
 end
