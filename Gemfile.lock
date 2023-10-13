@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    winnow (1.0.0)
+    winnow (2.0.0)
       rails (>= 7.0.0, < 7.2.0)
 
 GEM
