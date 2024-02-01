@@ -69,7 +69,7 @@ module Winnow
 
       def connection_adapter
         case connection.adapter_name
-        when /mysql/i
+        when /(?:mysql|trilogy)/i
           :mysql
         when /postgres/i
           :postgres
